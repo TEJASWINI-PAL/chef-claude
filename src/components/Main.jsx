@@ -1,16 +1,22 @@
 import React, { useState } from "react";
+import CloudRecipe from "./CloudRecipe";
+import IngredientList from "./IngredientList";
+import { getRecipeFromChefClaude} from "../ai";
 
 const Main = () => {
-  const [ingredents, setIngredients ] = React.useState([]);
+  const [ingredents, setIngredients] = React.useState([]);
 
-  const allItems=ingredents.map(thing=>(
-    <li key= {thing}> {thing}</li>
-  ))
+  const [recipe, setRecipe] = useState("");
+
   const addIngredients = (formData) => {
-     const newIngredients=formData.get("ingredient")
-    setIngredients (preValue => [...preValue,newIngredients]);
+    const newIngredients = formData.get("ingredient");
+    setIngredients((preValue) => [...preValue, newIngredients]);
   };
-  console.log("ingred",ingredents)
+  const getRecipe = async() => {
+    const recipeMarkDown = await getRecipeFromChefClaude(ingredents);
+    console.log(recipeMarkDown)
+     setRecipe(recipeMarkDown);
+  };
 
   return (
     <>
@@ -23,12 +29,12 @@ const Main = () => {
             name="ingredient"
           />
           <button>Add Ingredients</button>
-
-      <div>
-        {allItems}
-      </div>
-  
         </form>
+        {ingredents.length > 0 && (
+          <IngredientList ingredents={ingredents} getRecipe={getRecipe} />
+        )}
+
+        {recipe && <CloudRecipe recipe={recipe} />}
       </main>
     </>
   );
